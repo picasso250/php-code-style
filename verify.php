@@ -9,6 +9,7 @@ $encoding_table = array();
 $tab_table = array();
 $if_table = array();
 $define_table = array();
+$upper_table = array();
 while ($queue) {
     $r = array_pop($queue);
     echo "for dir $r\n";
@@ -60,6 +61,12 @@ while ($queue) {
                     echo "Warning: line $i: $line define not upper case\n";
                     $define_table[$f][] = $i;
                 }
+
+                // 3.4. [强制]关键字true、false、null必须小写
+                if (preg_match('/\btrue\b|\bfalse\b|\bnull\b/i', $line) && !preg_match('/\btrue\b|\bfalse\b|\bnull\b/', $line)) {
+                    echo "Warning: line $i: $line upper case of true/false/null\n";
+                    $upper_table[$f][] = $i;
+                }
             }
         } elseif (is_dir($f)) {
             $queue[] = $f;
@@ -81,3 +88,7 @@ print_r($if_table);
 
 echo "\ndefine\n";
 print_r($define_table);
+
+echo "\nupper\n";
+print_r($upper_table);
+
