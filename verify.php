@@ -7,6 +7,7 @@ $queue = array($root);
 $bom_table = array();
 $encoding_table = array();
 $tab_table = array();
+$it_table = array();
 while ($queue) {
     $r = array_pop($queue);
     echo "for dir $r\n";
@@ -41,9 +42,20 @@ while ($queue) {
             while (($line = fgets($fh)) != false) {
                 // echo "$i: $line\n";
                 $i++;
+                // 2.1. [强制]程序块要采用缩进风格编写，缩进的空格数为4个。
                 if (preg_match('/^\t/', $line)) {
                     echo "Warning: tab on line $i\n";
                     $tab_table[$f] = $i;
+                }
+
+                // 2.4. [强制]if/while等结构体，即使只有一行，也必须加上花括号，不得写成一行。
+                if (preg_match('/\b(if|while)\b/', $line) && !preg_match('/\{\s*$/', $line)) {
+//                    echo $line[strlen($line)-1],"\n";
+//                    && $line[strlen($line)-1] != '{'
+//                    echo "$i:$line"."\n";exit;
+                    echo "Warning: line $i: $line if/while not follow by {\n";
+                    $if_table[$f][] = $i;
+                    exit;
                 }
             }
         } elseif (is_dir($f)) {
@@ -60,3 +72,6 @@ print_r(($encoding_table));
 
 echo "\ntab\n";
 print_r($tab_table);
+
+echo "\nif/while\n";
+print_r($if_table);
