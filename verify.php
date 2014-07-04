@@ -8,6 +8,7 @@ $bom_table = array();
 $encoding_table = array();
 $tab_table = array();
 $if_table = array();
+$define_table = array();
 while ($queue) {
     $r = array_pop($queue);
     echo "for dir $r\n";
@@ -53,6 +54,12 @@ while ($queue) {
                     echo "Warning: line $i: $line if/while not follow by {\n";
                     $if_table[$f][] = $i;
                 }
+
+                // 3.2. [强制]常量命名使用全部大写字符，单词之间以’_’连接。
+                if (preg_match('/\bdefine\(/', $line) && !preg_match('/\bdefine\(\'[A-Z0-9_]+\'/', $line)) {
+                    echo "Warning: line $i: $line define not upper case\n";
+                    $define_table[$f][] = $i;
+                }
             }
         } elseif (is_dir($f)) {
             $queue[] = $f;
@@ -71,3 +78,6 @@ print_r($tab_table);
 
 echo "\nif/while\n";
 print_r($if_table);
+
+echo "\ndefine\n";
+print_r($define_table);
